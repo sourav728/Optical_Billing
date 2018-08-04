@@ -9,22 +9,29 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-
+    String display_text="";
     /*
      * Notifications from UsbService will be received here.
 
@@ -244,12 +251,37 @@ public class MainActivity extends AppCompatActivity {
     public void storevalue()
     {
         arrayList.add(data);
+
         i++;
         if (i == 1614)
         {
-            String display_text = display.getText().toString();
+             display_text = display.getText().toString();
             String meter_serial_no = display_text.substring(display_text.indexOf("/")+5,display_text.indexOf("H"));
             Toast.makeText(MainActivity.this, "Data "+ meter_serial_no, Toast.LENGTH_SHORT).show();
+
+        }
+        writeToFile(display_text);
+    }
+
+    //Below code is for writing the Opticals port output in text file
+    private void writeToFile(String currentStacktrace) {
+        try {
+
+            //Gets the Android external storage directory & Create new folder Crash_Reports
+            File dir = new File(Environment.getExternalStorageDirectory(),
+                    "Opticals");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            String filename = "Optical" + ".txt";
+            File reportFile = new File(dir, filename);
+            FileWriter fileWriter = new FileWriter(reportFile);
+            fileWriter.append(currentStacktrace);
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (Exception e) {
+            Log.e("ExceptionHandler", e.getMessage());
         }
     }
 }
